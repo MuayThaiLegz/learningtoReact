@@ -1,6 +1,5 @@
 import React from "react";
 
-import { ReactDOM } from "react";
 
 var TestStore = React.createClass({
     getInitialState() {
