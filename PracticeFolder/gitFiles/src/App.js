@@ -1,62 +1,75 @@
-require("jquery");
-require("bootstrap");
-require("bootstrap-webpack");
-import React from 'react';
-import BookList from './booklist';
-import ShippingDetails from './shipping_details';
-import DeliveryDetails from './delivery_details';
-import Confirmation from './confirmation';
-import Success from './success';
-import ModalAlertTimeout from './modals/modal_alert_timeout'
-import "object-assign";
-
-var BookStore = React.createClass({
-  getInitialState() {
-    return ({currentStep: 1, formValues: {}, cartTimeout: 60});
-  },
-
-  updateCartTimeout(timeout){
-    this.setState({cartTimeout: timeout});
-  },
-
-  updateFormData(formData) {
-    var formValues = Object.assign({}, this.state.formValues, formData);
-    var nextStep = this.state.currentStep + 1;
-    this.setState({currentStep: nextStep, formValues: formValues});
-  },
-
-  alertCartTimeout(){
-    React.render(<ModalAlertTimeout />, document.getElementById('modalAlertTimeout'));
-    this.setState({currentStep: 1, formValues: {}, cartTimeout: 1});
-  },
-
-  render() {
-    switch (this.state.currentStep) {
-      case 1:
-        return <BookList updateFormData={this.updateFormData}/>;
-      case 2:
-        return <ShippingDetails updateFormData={this.updateFormData}
-                                cartTimeout={this.state.cartTimeout}
-                                updateCartTimeout={this.updateCartTimeout}
-                                alertCartTimeout={this.alertCartTimeout}/>;
-      case 3:
-        return <DeliveryDetails updateFormData={this.updateFormData}
-                                cartTimeout={this.state.cartTimeout}
-                                updateCartTimeout={this.updateCartTimeout}
-                                alertCartTimeout={this.alertCartTimeout}/>;
-      case 4:
-        return <Confirmation data={this.state.formValues}
-                             updateFormData={this.updateFormData}
-                             cartTimeout={this.state.cartTimeout}/>;
-      case 5:
-        return <Success data={this.state.formValues} cartTimeout={this.state.cartTimeout}/>;
-
-        return <div><h2>Your cart timed out, Please try again!</h2></div>;
-      default:
-        return <BookList updateFormData={this.updateFormData}/>;
+getInitialState() {
+    return {
+        docs: [], numFound: 0, num_found: 0,
+        start: 0, searchCompleted: false, searching: false
     }
-  }
-});
+}
 
 
-module.exports = BookStore;
+    Updated getInitialState function of App comp
+// src.App.js
+
+*/
+getInitialState(){
+    return {
+        books: [],
+        totalBooks: 0,
+        searchCompleted: false,
+        searching: false,
+        sorting: 'asc'
+    }
+}
+
+/*
+We use the sort-by npm package and update the state with the sorted books.
+*/
+
+import sortBy from "sort-by"
+
+_sortByTitle() {
+    let sortByAttribute = this.state.sorting === 'asc' ? "title" :
+    "-title";
+        let unsortedBooks = this.state.books;
+        let sortedBooks = unsortedBooks.sort(sortBy(sortByAttribute));
+        this.setState({ books: sortedBooks, sorting: this._toggleSorting()});
+},
+
+_toggleSorting() {
+    return this.state.sorting === 'asc' ? 'desc' : 'asc' ;
+}
+
+/*  Reacts assumes state objects are immutable. Here we are assigning state value to unsortedBooks
+
+    we then mutate unsortedBooks into sortedBooks; as side effect we are also mutating current val od this.state
+
+    this can be easily se solve with [Object.assign] we create a new array and copy current val of this.state.books in it.
+
+    We can then sort the new arr and call setState with new sorted array  < ---- doesnt work
+
+*/
+
+/*
+React provides the Update addon with immutability helpers, Which we use to solve this issue
+
+When using immutability helpers know this
+1. What needs to to be changed?
+    We need to change  this.state to display sorted books
+
+2. Where it needs to be changed?
+    Mutation should happen in this.state.books
+
+3. How it needs to be changed?
+    We need to sort elements per criterion
+
+*/
+
+import Update from 'react-addons-update';
+
+_sortByTitle() {
+    let sortByAttribute = this.state.sorting === 'asc' ? "title" : "-title";
+    
+    let newState = Update(this.state,
+         {books: {$apply: (books) => {return books.sort(sortBy(sortByAttribute))}},
+         sorting: { $apply: (sorting) => { return sorting === 'asc' ? 'desc' : 'asc'}}});
+         this.setState(newState);
+}
