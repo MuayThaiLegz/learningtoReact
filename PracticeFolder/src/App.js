@@ -1,15 +1,22 @@
 require("jquery");
+require('btoa');
+require('whatwg-fetch');
 require("bootstrap");
 require("bootstrap-webpack");
 require("font-awesome-webpack");
-require('btoa');
-import React from 'react';
 import "babel-core/polyfill";
+
+
+import React from 'react';
+import Update from 'react-addons-update';
+import sortBy from 'sort-by';
+import RowAlternator from '../src/RowAlternator';
+import Spinner from '../src/Spinner';
 
 
 var SearchPage = React.createClass({
   getInitialState(){
-    return {docs: [], numFound: 0, num_found: 0, start: 0, searchCompleted: false, searching: false}
+    return {docs: [], numFound: 0, num_found: 0, start: 0, searchCompleted: false, searching: false, sorting: 'asc'}
   },
   render() {
     console.log(this.state);
@@ -56,9 +63,9 @@ var SearchPage = React.createClass({
             <th>Author</th>
             <th>Edition</th>
             </thead>
-            <tbody>
+            <RowAlternator firstColor="white" secondColor="lightgrey">
             {this.renderDocs(this.state.docs)}
-            </tbody>
+            </RowAlternator>
           </table>
         </div>
       </div>
@@ -106,8 +113,42 @@ var SearchPage = React.createClass({
         console.log('Parsing failed', ex)
       })
 
-  }
+  },
 
+
+  sortByTitle() {
+    let sortByAttribute = this.state.sorting === 'asc' ? 'title' : -'title';
+    let newState = Update(this.state,
+                          { books: { $apply: (books) => { return books.sort(sortBy(sortByAttribute)) } }, 
+                            sorting: {$apply: (sorting) => { return sorting === 'asc' ? 'desc' : 'asc' } } });
+    this.setState(newState);
+  },
+
+  _renderBooks() {
+    return this.state.books.map((book, idx) => {
+      return (
+        <BookRow key={idx}
+                 title={book.title}
+                 author_name={book.author_name}
+                 edition_count={book.edition_count} />
+      );
+    })
+  },
+
+
+  _displaySearchResults() {
+    if (this.state.searching) {
+      return <Spinner />;
+    } else if (this.state.searchCompleted) {
+      return (
+        <BookList
+            searchCount={this.state.totalBooks}
+            _sortByTitle={this._sortByTitle}>
+          {this._renderBooks()}
+        </BookList>
+      );
+    }
+  }
 });
 
 
