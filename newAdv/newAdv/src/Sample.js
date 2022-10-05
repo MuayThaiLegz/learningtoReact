@@ -8,9 +8,9 @@ const Sample = React.createClass({
     let cat = Cats.get(this.props.params.cid);
     return (
         <div>
-          <p>CID for the Cat: {this.props.params.cid}, and Random ID: {this.props.params.randomId}</p>
-          <p>Name of this Cat is: {cat.get('name')}</p>
-          <p>Some interesting details about this Cat:</p>
+          <p>CID for the image: {this.props.params.cid}, and Random ID: {this.props.params.randomId}</p>
+          <p>Name of this image is: {cat.get('name')}</p>
+          <p>Some interesting details about this image:</p>
           <p> {cat.get('details')} </p>
           <p>
             <Link to={`/pictures/${cat.cid}`} state={{ modal: true, returnTo: this.props.location.pathname }}>

@@ -15,11 +15,7 @@ const Home = React.createClass({
                   <img style={{ margin: 10 }} src={cat.get('src')} height="400" />
                 </Link>
             ))}
-            <div>
-            <p>onClick={() =><Link to={`/`}></Link>}</p>
-
             </div>
-          </div>
           <p><Link to={`/this/${samplepic.cid}/is/456/sampleroute`}>{`Interesting Details about ${samplepic.get('name')}`}</Link></p>
         </div>
     )
