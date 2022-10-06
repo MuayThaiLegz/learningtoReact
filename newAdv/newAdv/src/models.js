@@ -5,21 +5,31 @@ const PictureModel = Backbone.Model.extend({
     default:{
         src: 'https://picsum.photos/id/237/200/300/',
         name : 'Pusheen',
-        details: 'Pushen the print'
+        details: 'Pushen the print',
+        faved: false
+
     }
 });
 
 
-const Cats = new Backbone.Collection;
+class PicGenerator {
+    constructor() {
+        this.Picz = new Backbone.Collection;
+        [600, 601, 602, 603, 604, 605].map( (height)=>{
+            this.createPicture(height, 600);
+        })
+    }
 
-Cats.add(new PictureModel({src:'https://picsum.photos/200/285/', name: Faker.Name.findName(), details:Faker.Lorem.paragraph()}));
-Cats.add(new PictureModel({src:'https://picsum.photos/200/290/', name: Faker.Name.findName(), details:Faker.Lorem.paragraph()}));
-Cats.add(new PictureModel({src:'https://picsum.photos/200/295/', name: Faker.Name.findName(), details:Faker.Lorem.paragraph()}));
-Cats.add(new PictureModel({src:'https://picsum.photos/200/300/', name: Faker.Name.findName(), details:Faker.Lorem.paragraph()}));
-Cats.add(new PictureModel({src:'https://picsum.photos/200/305/', name: Faker.Name.findName(), details:Faker.Lorem.paragraph()}));
-Cats.add(new PictureModel({src:'https://picsum.photos/200/310/', name: Faker.Name.findName(), details:Faker.Lorem.paragraph()}));
+    createPicture(height = _.random(600, 650), width = 600) {
+        console.log('Adding new picture');
+        this.Picz.add(new PictureModel({
+            src: `https://picsum.photos/${height}/${width}/`,
+            name : Faker.Name.findName(),
+            details: Faker.Lorem.paragraph()
+        }));
+    }
+}
 
-console.log(Cats.first().get('name'));
-console.log(Cats.first().get('details'));
 
-module.exports = {Cats, PictureModel}
+
+module.exports = {PictureModel, PicGenerator}

@@ -19,7 +19,6 @@ render((
     <Route path='/' component={App}>
         <IndexRoute component={Home}/>
         <Route path="pictures/:id" component={Picture}/>
-        <Route path="/this/:cid/is/:randomId/sampleroute" component={Sample}/>
         </Route>
     </Router>
 ), document.getElementById('rootElement'));
